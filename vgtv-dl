@@ -1,0 +1,10 @@
+#!/bin/bash
+
+curl $1 -o /tmp/vgtv
+
+video=$(grep -P -o '(https...dd).*?mp4' tmpfile1 | head -1)
+
+rm /tmp/vgtv
+
+ffmpeg -hide_banner -loglevel error -y -i $video -c copy ~/Videos/vgtv.mp4 && echo "Video lastet ned"
+
