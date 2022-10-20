@@ -1,0 +1,14 @@
+#!/bin/bash
+
+curlingtekst() {
+for ((side=100; side <= 147; side++ )); do
+    curl -s https://www.nrk.no/teletextresources/$side.1-w500.gif -o /tmp/teksttv.png
+    kitty +kitten icat /tmp/teksttv.png; 
+    sleep 30
+done
+}
+
+while true; do
+clear
+curlingtekst
+done
