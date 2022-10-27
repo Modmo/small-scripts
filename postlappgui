@@ -1,0 +1,34 @@
+#!/bin/bash
+
+
+#### Hente informasjon med skjema fra zenity og putte det i RESULTAT variable
+resultat=$(zenity --forms --title="Postlapp"  --text="Fyll inn informasjon" --separator="," --add-entry="Skolenavn:" --add-entry="Adresse:" --add-entry="Poststed(feks 9999 OSLO):")
+
+#### Splitte RESULTAT variable inn til 3 stk
+skole="$(cut -d',' -f1 <<<"$resultat")"
+
+adresse="$(cut -d',' -f2 <<<"$resultat")"
+
+poststed="$(cut -d',' -f3 <<<"$resultat")"
+
+#### legge til next line slik at imagemagick deler opp output
+skole+=" \n "
+adresse+=" \n "
+
+(
+echo "50"; echo "# Sender utskrift"; sleep 1
+echo "75"; sleep 1
+echo "100"; echo "# Skrevet ut!"
+
+
+) | zenity --progress --title="Skriver ut" --text="Oppretter utskrift" --percentage=20 &
+
+#### Lager en png med info
+convert -background white -fill black -size 600x300 -gravity South label:"'$skole$adresse$poststed'" -border 60x18 -monochrome -rotate 90 /tmp/postlapp.png
+
+#### venter på at png er klar for reading
+sleep 1
+
+#### Sender png til utskrift
+cd /home/hhauk/ql570 
+./ql570 /dev/usb/lp0 62x29 /tmp/postlapp.png
