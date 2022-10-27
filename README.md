@@ -19,3 +19,4 @@ Can be modified to output to other terminals to.
 ## Label Printer
 
 - Postlapp CLI
+- Postlapp GUI
