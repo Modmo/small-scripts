@@ -1,6 +1,6 @@
 #!/bin/bash
 
-curl $1 -o /tmp/vgtv
+curl $1 -so /tmp/vgtv
 
 video=$(grep -P -o '(https...dd).*?mp4' tmpfile1 | head -1)
 
