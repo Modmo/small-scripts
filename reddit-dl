@@ -3,7 +3,7 @@
 link=$1
 link+='.json'
 
-curl --user-agent 'bobby' $link -o /tmp/reddit
+curl --user-agent 'bobby' $link -so /tmp/reddit
 
 videolink=$(grep -P -o '(https).*?(\d\d\d.mp4)' /tmp/reddit | head -1)
 
