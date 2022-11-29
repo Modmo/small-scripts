@@ -2,7 +2,7 @@
 
 curl $1 -so /tmp/vgtv
 
-video=$(grep -P -o '(https...dd).*?mp4' tmpfile1 | head -1)
+video=$(grep -P -o '(https...dd).*?mp4' /tmp/vgtv | head -1)
 
 rm /tmp/vgtv
 
