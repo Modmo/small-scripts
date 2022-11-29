@@ -81,3 +81,5 @@ sleep 0.1
 
 echo -ne "|##########| 100%\n\n"
 echo "Postlapp skrevet ut!"
+
+rm /tmp/postlapp.png
