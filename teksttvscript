@@ -1,10 +1,14 @@
 #!/bin/bash
 
 curlingtekst() {
-for ((side=100; side <= 147; side++ )); do
+for ((side=100; side <= 150; side++ )); do
     curl -s https://www.nrk.no/teletextresources/$side.1-w500.gif -o /tmp/teksttv.png
-    kitty +kitten icat /tmp/teksttv.png; 
-    sleep 30
+	imagetest=$(file /tmp/teksttv.png -b | cut -f 1 -d " ")
+    	if [[ "$imagetest" != "HTML" ]]; then
+		kitty +kitten icat /tmp/teksttv.png; sleep 40
+	else
+		:
+	fi
 done
 }
 
