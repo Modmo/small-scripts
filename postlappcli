@@ -1,19 +1,24 @@
 #!/bin/bash
+#### Script for ql570
+
+#### Sjekker om printer er koblet til
+
+printer=$(lsusb | grep -o QL-570)
+echo $printer
+
+if [ "$printer" != "QL-570" ]; then
+	echo "printer er ikke koblet til!"; exit
+else
+	:
+fi
+
 
 #### Henter variables for imagemagick bildet
 read -p "Navn på skole: " skolenavn
 read -p "Adresse til skole: " adresse
 
 #### Henter variable og tester om Poststed er riktig format.
-while read -p "Poststed (feks 1234 OSLO): " poststed
-	do  posttest=$(grep -P -o '\A\d{4} \S{3,}' <<<$poststed)
-		if [[ -z "$posttest"  ]]
-		then
-			echo "Poststed format er feil!"
-		else
-			break
-		fi
-done
+read -p "Poststed (feks 1234 OSLO): " poststed
 
 #### legger til next line slik at imagemagick deler opp output
 skolenavn+=" \n "
@@ -82,4 +87,4 @@ sleep 0.1
 echo -ne "|##########| 100%\n\n"
 echo "Postlapp skrevet ut!"
 
-rm /tmp/postlapp.png
+#rm /tmp/postlapp.png
