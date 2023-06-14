@@ -1,7 +1,6 @@
 #!/bin/bash
-#### Script for ql570
 
-#### Sjekker om printer er koblet til
+#### Sjekker om printer er koblet til og sjekker om man har tilgang
 
 printer=$(lsusb | grep -o QL-570)
 echo $printer
@@ -12,6 +11,12 @@ else
 	:
 fi
 
+access=$(ls -l /dev/usb/lp0 | grep -Po '([crwx]+-){2}\K([rwx-]+)')
+if [[ "$access" != *"rw"* ]]; then
+	echo "Du har ikke tilstrekkelig tilgang til printeren! (/dev/usb/lp0), trenger rw access for others"; exit
+else
+	:
+fi
 
 #### Henter variables for imagemagick bildet
 read -p "Navn på skole: " skolenavn
@@ -62,8 +67,7 @@ echo -ne "|#####     | 50% \r"
 sleep 0.1
 
 #### Sender png til utskrift
-cd ~/ql570 
-./ql570 /dev/usb/lp0 62x29 /tmp/postlapp.png &> /dev/null
+cd ~/ql570 ;./ql570 /dev/usb/lp0 62x29 /tmp/postlapp.png &> /dev/null
 
 #### Mer progressbar
 echo -ne "|######    | 55% \r"
@@ -87,4 +91,4 @@ sleep 0.1
 echo -ne "|##########| 100%\n\n"
 echo "Postlapp skrevet ut!"
 
-#rm /tmp/postlapp.png
+rm /tmp/postlapp.png
