@@ -44,7 +44,7 @@ sleep 0.1
 
 
 #### Lager en png med info
-convert -background white -fill black -size 600x200 -gravity South label:"'$skolenavn$adresse$poststed'" -border 60x68 -monochrome -rotate 90 /tmp/postlapp.png
+convert -background white -fill black -size 600x200 -gravity South label:"$skolenavn$adresse$poststed" -border 60x68 -monochrome -rotate 90 /tmp/postlapp.png
 
 #### Mer progressbar
 echo -ne "|###       | 30% \r"
