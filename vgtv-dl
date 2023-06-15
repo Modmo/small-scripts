@@ -1,10 +1,15 @@
 #!/bin/bash
 
-curl $1 -so /tmp/vgtv
+### Grab website
+url=$1
 
-video=$(grep -P -o '(https...dd).*?mp4' /tmp/vgtv | head -1)
+### Grab Video link
+video=$(curl "$url" -s | grep -Po '(mp4\"\:\")\K(https:\/\/[a-z-\.\/0-9\_]+)(\.mp4)')
 
-rm /tmp/vgtv
-
+### Download video with link
 ffmpeg -hide_banner -loglevel error -y -i $video -c copy ~/Videos/vgtv.mp4 && echo "Video lastet ned"
 
+### Debug
+#echo $1
+#echo $url
+#echo $video
