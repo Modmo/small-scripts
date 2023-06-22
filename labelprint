@@ -1,0 +1,78 @@
+#!/bin/bash
+
+#### Sjekker om printer er koblet til og sjekker om man har tilgang
+
+printer=$(lsusb | grep -o QL-570)
+echo $printer
+
+if [ "$printer" != "QL-570" ]; then
+	echo "printer er ikke koblet til!"; exit
+else
+	:
+fi
+
+access=$(ls -l /dev/usb/lp0 | grep -Po '([crwx]+-){2}\K([rwx-]+)')
+if [[ "$access" != *"rw"* ]]; then
+	echo -e "Du har ikke tilstrekkelig tilgang til printeren! (/dev/usb/lp0), trenger rw access for others\nPrøver å sette tilgang.."; sudo chmod o+rw /dev/usb/lp0
+else
+	:
+fi
+
+#### Henter variables for imagemagick bildet
+read -p "Felt 1: " felt1
+read -p "Felt 2: " felt2
+read -p "Felt 3: " felt3
+
+#### legger til next line slik at imagemagick deler opp output
+felt1+=" \n "
+felt2+=" \n "
+
+#### Progressbar
+echo -ne "|          |  0% \r"
+sleep 0.1
+echo -ne "|#         | 10% \r"
+sleep 0.1
+echo -ne "|##        | 15% \r"
+sleep 0.1
+echo -ne "|##        | 20% \r"
+sleep 0.1
+echo -ne "|###       | 25% \r"
+sleep 0.1
+
+
+
+#### Lager en png med info
+convert -background white -fill black -size 600x200 -gravity West label:"$felt1$felt2$felt3" -border 60x68 -monochrome -rotate 90 /tmp/label.png
+
+#### Mer progressbar
+echo -ne "|###       | 30% \r"
+sleep 0.1
+echo -ne "|####      | 35% \r"
+sleep 0.1
+echo -ne "|####      | 40% \r"
+sleep 0.1
+echo -ne "|#####     | 45% \r"
+sleep 0.1
+echo -ne "|#####     | 50% \r"
+sleep 0.1
+
+#### Sender png til utskrift
+cd ~/ql570 ;./ql570 /dev/usb/lp0 62x29 /tmp/label.png &> /dev/null
+
+#### Mer progressbar
+echo -ne "|######    | 55% \r"
+sleep 0.1
+echo -ne "|######    | 60% \r"
+sleep 0.1
+echo -ne "|#######   | 70% \r"
+sleep 0.1
+echo -ne "|########  | 75% \r"
+sleep 0.1
+echo -ne "|########  | 80% \r"
+sleep 0.1
+echo -ne "|######### | 90% \r"
+sleep 0.1
+echo -ne "|##########| 100%\n\n"
+echo "Postlapp skrevet ut!"
+
+#rm /tmp/label.png
