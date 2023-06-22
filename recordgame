@@ -1,0 +1,2 @@
+#!/bin/bash
+ffmpeg -y -video_size 2560x1440 -framerate 24 -f x11grab -i $DISPLAY+2560,0 -f pulse -ac 10 -i 58 -crf 30 ~/Videos/recordscreen-$(date -Iminutes | tr ':+' '-').mp4
