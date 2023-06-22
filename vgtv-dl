@@ -4,10 +4,10 @@
 url=$1
 
 ### Grab Video link
-video=$(curl "$url" -s | grep -Po '(mp4\"\:\")\K(https:\/\/[a-z-\.\/0-9\_]+)(\.mp4)')
+video=$(curl -L "$url" -s | grep -Pom 1 '(mp4\"\:\")\K(https:\/\/[a-z-\.\/0-9\_]+)(\.mp4)')
 
 ### Download video with link
-ffmpeg -hide_banner -loglevel error -y -i $video -c copy ~/Videos/vgtv.mp4 && echo "Video lastet ned"
+ffmpeg -hide_banner -loglevel error -y -i $video -c copy ~/Videos/vgtv$(date -Iminutes | tr ':+' '-').mp4 && echo "Video lastet ned"
 
 ### Debug
 #echo $1
