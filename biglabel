@@ -1,0 +1,79 @@
+#!/bin/bash
+
+#### Sjekker om fil er oppgitt
+#
+if [[ -z "$1" ]]; then
+	echo "Husk å fyll inn fil sti!"; exit
+else
+	:
+fi
+
+if [[ "$1" != *"png"* ]]; then
+	echo "Kan kun printe PNG, monochrome vil ha bedre effekt"; exit
+else
+	:
+fi
+
+#### Sjekker om printer er koblet til og sjekker om man har tilgang
+
+printer=$(lsusb | grep -o QL-1060N)
+echo $printer
+
+if [ "$printer" != "QL-1060N" ]; then
+	echo "printer er ikke koblet til!"; exit
+else
+	:
+fi
+
+access=$(ls -l /dev/usb/lp0 | grep -Po '([crwx]+-){2}\K([rwx-]+)')
+if [[ "$access" != *"rw"* ]]; then
+	echo -e "Du har ikke tilstrekkelig tilgang til printeren! (/dev/usb/lp0), trenger rw access for others\nPrøver å sette tilgang.."; sudo chmod o+rw /dev/usb/lp0
+else
+	:
+fi
+
+#### Progressbar
+echo -ne "|          |  0% \r"
+sleep 0.1
+echo -ne "|#         | 10% \r"
+sleep 0.1
+echo -ne "|##        | 15% \r"
+sleep 0.1
+echo -ne "|##        | 20% \r"
+sleep 0.1
+echo -ne "|###       | 25% \r"
+sleep 0.1
+
+#### Mer progressbar
+echo -ne "|###       | 30% \r"
+sleep 0.1
+echo -ne "|####      | 35% \r"
+sleep 0.1
+echo -ne "|####      | 40% \r"
+sleep 0.1
+echo -ne "|#####     | 45% \r"
+sleep 0.1
+echo -ne "|#####     | 50% \r"
+sleep 0.1
+
+#### Sender png til utskrift
+cd ~/qlprint ;./build/qlprint -Ca $1 #&> /dev/null
+
+#### Mer progressbar
+echo -ne "|######    | 55% \r"
+sleep 0.1
+echo -ne "|######    | 60% \r"
+sleep 0.1
+echo -ne "|#######   | 70% \r"
+sleep 0.1
+echo -ne "|########  | 75% \r"
+sleep 0.1
+echo -ne "|########  | 80% \r"
+sleep 0.1
+echo -ne "|######### | 90% \r"
+sleep 0.1
+echo -ne "|##########| 100%\n\n"
+echo "Postlapp skrevet ut!"
+
+###debug
+echo $1
