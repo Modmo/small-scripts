@@ -13,7 +13,7 @@ fi
 
 access=$(ls -l /dev/usb/lp0 | grep -Po '([crwx]+-){2}\K([rwx-]+)')
 if [[ "$access" != *"rw"* ]]; then
-	echo "Du har ikke tilstrekkelig tilgang til printeren! (/dev/usb/lp0), trenger rw access for others"; exit
+	echo -e "Du har ikke tilstrekkelig tilgang til printeren! (/dev/usb/lp0), trenger rw access for others\nPrøver å sette tilgang.."; sudo chmod o+rw /dev/usb/lp0
 else
 	:
 fi
