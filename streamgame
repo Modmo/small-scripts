@@ -1,2 +1,3 @@
 #!/bin/bash
-ffmpeg -y -video_size 2560x1440 -framerate 24 -f x11grab -i $DISPLAY+2560,0 -f pulse -ac 10 -i 58 -crf 30 -f mpegts udp://$DESTINATION
+window=$(xwininfo -root -children | grep -Po '\dx[0-9a-z]+ \K\".*(?=: \()' | uniq | dmenu -l 4)
+ffmpeg -y -video_size $(xwininfo -root -children | grep -Po "$window.*\)  \K\d+x\d+") -framerate 24 -f x11grab -i $DISPLAY$(xwininfo -root -children | grep -Po "$window.*\)  \d+x\d+\K\+\d+\+\d+") -f pulse -i $(wpctl status | grep -Po '\d\d\.\K.*[^\]]$' | uniq | dmenu -l 8) -crf 30 -f flv rtmp://127.0.0.1/stream
