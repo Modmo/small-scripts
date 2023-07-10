@@ -1,0 +1,2 @@
+#!/bin/bash
+sudo pacman -S archlinux-keyring --noconfirm && sudo pacman-key --refresh-keys && sudo pacman-key --init && sudo pacman -Syyu --noconfirm
