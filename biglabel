@@ -44,6 +44,13 @@ sleep 0.1
 echo -ne "|###       | 25% \r"
 sleep 0.1
 
+#### For å få Q(uality) og a(uto cut) option i qlprint til å fungere må man først printe noe med kun -C(ontinuous) flagget.
+#Lager en 1x1 image og printer med -a for å få -QCa til å fungere
+#
+convert -size 1x1 canvas:white /tmp/white.png
+cd $HOME/qlprint/build
+sudo ./qlprint -C /tmp/white.png #&> /dev/null
+
 #### Mer progressbar
 echo -ne "|###       | 30% \r"
 sleep 0.1
@@ -57,7 +64,7 @@ echo -ne "|#####     | 50% \r"
 sleep 0.1
 
 #### Sender png til utskrift
-cd ~/qlprint ;./build/qlprint -Ca $1 #&> /dev/null
+./qlprint -QCa $1 #&> /dev/null
 
 #### Mer progressbar
 echo -ne "|######    | 55% \r"
