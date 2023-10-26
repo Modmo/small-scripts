@@ -15,7 +15,6 @@ else
 fi
 
 #### Sjekker om printer er koblet til og sjekker om man har tilgang
-
 printer=$(lsusb | grep -o QL-1060N)
 echo $printer
 
