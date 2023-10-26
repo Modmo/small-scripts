@@ -12,14 +12,14 @@ else
 fi
 
 productid=$(lsusb | grep -Po "([a-z0-9]{4}):([a-z0-9]{4})(\w| |,)+($printer)" | grep -Po '([a-z0-9]{4}):\K([a-z0-9]{4})')
-mountport=$(sudo dmesg | tail -n 14 | grep -iP "(0x$productid$)" | grep -Po 'lp\d')
+mountport=$(sudo dmesg | tail -n 14 | grep -iP "(0x$productid$)" | grep -Po 'lp\d' | head -1)
 
 echo $productid
 echo $mountport
 
 access=$(ls -l /dev/usb/$mountport | grep -Po '([crwx]+-){2}\K([rwx-]+)')
 if [[ "$access" != *"rw"* ]]; then
-        echo -e "Du har ikke tilstrekkelig tilgang til printeren! (/dev/usb/lp0), trenger rw access for others\nPrøver å sette tilgang.."; sudo chmod o+rw /dev/usb/$mountport
+	echo -e "Du har ikke tilstrekkelig tilgang til printeren! (/dev/usb/$mountport), trenger rw access for others\nPrøver å sette tilgang.."; sudo chmod o+rw /dev/usb/$mountport
 else
 	:
 fi
