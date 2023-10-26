@@ -11,8 +11,16 @@ else
 	:
 fi
 
+
 productid=$(lsusb | grep -Po "([a-z0-9]{4}):([a-z0-9]{4})(\w| |,)+($printer)" | grep -Po '([a-z0-9]{4}):\K([a-z0-9]{4})')
 mountport=$(sudo dmesg | tail -n 14 | grep -iP "(0x$productid$)" | grep -Po 'lp\d' | head -1)
+
+###check if printer can be found in dmesg
+if [ -z "$mountport" ]; then
+	echo "Restart printer"; exit
+else
+	:
+fi
 
 echo $productid
 echo $mountport
