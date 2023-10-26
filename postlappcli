@@ -11,9 +11,15 @@ else
 	:
 fi
 
-access=$(ls -l /dev/usb/lp0 | grep -Po '([crwx]+-){2}\K([rwx-]+)')
+productid=$(lsusb | grep -Po "([a-z0-9]{4}):([a-z0-9]{4})(\w| |,)+($printer)" | grep -Po '([a-z0-9]{4}):\K([a-z0-9]{4})')
+mountport=$(sudo dmesg | tail -n 14 | grep -iP "(0x$productid$)" | grep -Po 'lp\d')
+
+echo $productid
+echo $mountport
+
+access=$(ls -l /dev/usb/$mountport | grep -Po '([crwx]+-){2}\K([rwx-]+)')
 if [[ "$access" != *"rw"* ]]; then
-	echo -e "Du har ikke tilstrekkelig tilgang til printeren! (/dev/usb/lp0), trenger rw access for others\nPrøver å sette tilgang.."; sudo chmod o+rw /dev/usb/lp0
+        echo -e "Du har ikke tilstrekkelig tilgang til printeren! (/dev/usb/lp0), trenger rw access for others\nPrøver å sette tilgang.."; sudo chmod o+rw /dev/usb/$mountport
 else
 	:
 fi
@@ -32,12 +38,16 @@ adresse+=" \n "
 #### Progressbar
 echo -ne "|          |  0% \r"
 sleep 0.1
+
 echo -ne "|#         | 10% \r"
 sleep 0.1
+
 echo -ne "|##        | 15% \r"
 sleep 0.1
+
 echo -ne "|##        | 20% \r"
 sleep 0.1
+
 echo -ne "|###       | 25% \r"
 sleep 0.1
 
@@ -49,31 +59,41 @@ convert -background white -fill black -size 600x200 -gravity South label:"$skole
 #### Mer progressbar
 echo -ne "|###       | 30% \r"
 sleep 0.1
+
 echo -ne "|####      | 35% \r"
 sleep 0.1
+
 echo -ne "|####      | 40% \r"
 sleep 0.1
+
 echo -ne "|#####     | 45% \r"
 sleep 0.1
+
 echo -ne "|#####     | 50% \r"
 sleep 0.1
 
 #### Sender png til utskrift
-cd ~/ql570 ;./ql570 /dev/usb/lp0 62x29 /tmp/postlapp.png &> /dev/null
+cd ~/ql570 ;./ql570 /dev/usb/$mountport 62x29 /tmp/postlapp.png &> /dev/null
 
 #### Mer progressbar
 echo -ne "|######    | 55% \r"
 sleep 0.1
+
 echo -ne "|######    | 60% \r"
 sleep 0.1
+
 echo -ne "|#######   | 70% \r"
 sleep 0.1
+
 echo -ne "|########  | 75% \r"
 sleep 0.1
+
 echo -ne "|########  | 80% \r"
 sleep 0.1
+
 echo -ne "|######### | 90% \r"
 sleep 0.1
+
 echo -ne "|##########| 100%\n\n"
 echo "Postlapp skrevet ut!"
 
