@@ -28,20 +28,20 @@ BWhite='\033[1;37m'       # White
 
 #make disk array
 #
-disks=( $(lsblk -plno path) ) 
+disks=( $(lsblk -plno path | grep '/sd.$') )
 
 #lists disks and partitions with numbers
 echo -e "Disks list: "
-lsblk -nlo path | less -NF
+lsblk -nlo path | grep '/sd.$' | less -NF
 
 #Gets user selected disks and makes array
 echo -ne "${BWhite}"
-read -p "Select partitions to format(feks 1 3) DEFAULT=6 8 10 12: " selecteddisks
+read -p "Select partitions to format(feks 1 3) DEFAULT=2 3 4 5: " selecteddisks
 echo -ne "${Color_Off}"
 selecteddisksarr=($selecteddisks)
 
 if [[ -z "$selecteddisks" ]]; then
-	selecteddisksarr=(6 8 10 12)
+        selecteddisksarr=(2 3 4 5)
 fi
 
 #debug
@@ -50,7 +50,7 @@ fi
 #List disks selected using both arrays
 for disk in "${selecteddisksarr[@]}"
 do
-	echo -ne "${BYellow} ${disks[$((disk-1))]} SELECTED\n"
+        echo -ne "${BYellow} ${disks[$((disk-1))]} SELECTED\n"
 done
 
 echo -ne "\n"
@@ -60,12 +60,12 @@ echo -ne "\n"
 #Format selected disks
 for disk in "${selecteddisksarr[@]}"
 do
-	echo -ne "${BYellow} Formatting Partition. ${Color_Off} \r"
-	sudo umount ${disks[$((disk-1))]} &> /dev/null
-	echo -ne "${BYellow} Formatting Partition.. ${Color_Off} \r"
-	sudo mkfs.vfat ${disks[$((disk-1))]} &> /dev/null
-	echo -ne "${BYellow} Formatting Partition... ${Color_Off} \r"
-	sync &> /dev/null
+        echo -ne "${BYellow} Formatting Partition. ${Color_Off} \r"
+        sudo umount ${disks[$((disk-1))]} &> /dev/null
+        echo -ne "${BYellow} Formatting Partition.. ${Color_Off} \r"
+        sudo mkfs.vfat -I ${disks[$((disk-1))]} #&> /dev/null
+        echo -ne "${BYellow} Formatting Partition... ${Color_Off} \r"
+        sync &> /dev/null
 done
 
 echo -ne "${BGreen} DONE\a"
