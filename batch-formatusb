@@ -63,7 +63,7 @@ do
         echo -ne "${BYellow} Formatting Partition. ${Color_Off} \r"
         sudo umount ${disks[$((disk-1))]} &> /dev/null
         echo -ne "${BYellow} Formatting Partition.. ${Color_Off} \r"
-        sudo mkfs.vfat -I ${disks[$((disk-1))]} #&> /dev/null
+        sudo mkfs.exfat -I ${disks[$((disk-1))]} #&> /dev/null
         echo -ne "${BYellow} Formatting Partition... ${Color_Off} \r"
         sync &> /dev/null
 done
