@@ -2,12 +2,12 @@
 
 A collection of small scripts to improve quality of life. <br>
 
-##recordgame requirements:
--xwininfo
--dmenu
--uniq
--pipewire
--ffmpeg
+## recordgame requirements:
+- xwininfo
+- dmenu
+- uniq
+- pipewire
+- ffmpeg
 
 ## NRK Tekst TV script
 
