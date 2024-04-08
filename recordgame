@@ -1,3 +1,5 @@
 #!/bin/bash
 window=$(xwininfo -root -children | grep -Po '\dx[0-9a-z]+ \K\".*(?=: \()' | uniq | dmenu -l 4)
-ffmpeg -y -video_size $(xwininfo -root -children | grep -Po "$window.*\)  \K\d+x\d+") -framerate 24 -f x11grab -i $DISPLAY$(xwininfo -root -children | grep -Po "$window.*\)  \d+x\d+\K\+\d+\+\d+") -f pulse -i $(wpctl status | grep -Po '\d\d\.\K.*[^\]]$' | uniq | dmenu -l 8) -crf 30 ~/Videos/recordscreen-$(date -Iminutes | tr ':+' '-').mp4
+audiosource=$(wpctl status | grep -Po '\d\d\.\K.*[^\]]$' | uniq | dmenu -l 8 | tr -d ' ')
+audioapp=$(pactl list sink-inputs | tr -d '\n' | grep -Po "$audiosource.*(object\.serial = \")\K\d+")
+ffmpeg -y -framerate 24 -video_size $(xwininfo -root -children | grep -Po "$window.*\)  \K\d+x\d+" | head -1) -f x11grab -i $DISPLAY$(xwininfo -root -children | grep -Po "$window.*\)  \d+x\d+\K\+\d+\+\d+") -f pulse -i $audioapp -crf 26 ~/Videos/recordscreen-$(echo $window | grep -Po "([A-Za-z])+")-$(date -Iminutes | tr ':+' '-').mp4
