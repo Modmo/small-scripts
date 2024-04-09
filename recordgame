@@ -1,6 +1,31 @@
 #!/bin/bash
+
+#Variables
+totalscreenw=$(xrandr -q | grep -Po 'current \K\d+')
+totalscreenh=$(xrandr -q | grep -Po 'current \d+ x \K\d+')
+
 window=$(xwininfo -root -children | grep -Po '\dx[0-9a-z]+ \K\".*(?=: \()' | uniq | dmenu -l 4)
+windowlocation=$(xwininfo -root -children | grep -Po "$window.*\)  \d+x\d+\K\+\d+\+\-?\d+")
+#windowlx=$(\d+x\d+\+\d+\+\K\-?\d+)
+#windowly=$(\d+x\d+\+\K\d+)
+
+windowsize=$(xwininfo -root -children | grep -Po "$window.*\)  \K\d+x\d+" | head -n 1)
+windoww=$(echo $windowsize | grep -Po '\d+' | head -n 1)
+windowh=$(echo $windowsize | grep -Po '\d+x\K\d+' | head -n 1)
+
+if [ "$windoww" -gt "$totalscreenw" ]; then
+  sizediff="$((windoww-totalscreenw))"
+  windoww="$((windoww-sizediff))"
+fi
+
+if [ "$windowh" -gt "$totalscreenh" ]; then
+  sizediff="$((windowh-totalscreenh))"
+  windowh="$((windowh-sizediff))"
+fi
+
 audiosource=$(wpctl status | grep -Po '\d\d\.\K.*[^\]]$' | uniq | dmenu -l 8 | tr -d ' ')
 audioapp=$(pactl list sink-inputs | tr -d '\n' | grep -Po "$audiosource.*(object\.serial = \")\K\d+")
-ffmpeg -y -loglevel error -framerate 24 -video_size $(xwininfo -root -children | grep -Po "$window.*\)  \K\d+x\d+" | head -1) -f x11grab -i $DISPLAY$(xwininfo -root -children | grep -Po "$window.*\)  \d+x\d+\K\+\d+\+\d+") -f pulse -i $audioapp -crf 26 -vf scale=1920:-1 ~/Videos/$(echo $window | grep -Po '([A-Z]|[a-z])+' | head -n 1)-$(date -Iminutes | tr ':+' '-').mp4
-echo -e "Debug start\nCapturing Window:$window\nAudio Source:$audiosource\nPipewire sink input ID:$audioapp\nDebug stop"
+microphone=$(pactl get-default-source)
+
+ffmpeg -y -loglevel error -framerate 24 -video_size "$windoww"x"$windowh" -f x11grab -i $DISPLAY$windowlocation -f pulse -i $audioapp -f pulse -i $microphone -map 0 -map 1 -map 2 -crf 26 -vf scale=1920:-1 ~/Videos/$(echo $window | grep -Po '([A-Z]|[a-z])+' | head -n 1)-$(date -Iminutes | tr ':+' '-').mkv
+echo -e "Debug start\nScreenW:$totalscreenw\nScreenH:$totalscreenh\nWindowsize:$windowsize\nWindowW:$windoww\nWindowH:$windowh\nSizeDiff:$sizediff\nWindowLocation:$windowlocation\nCapturing Window:$window\nAudio Source:$audiosource\nPipewire sink input ID:$audioapp\nDebug stop"
