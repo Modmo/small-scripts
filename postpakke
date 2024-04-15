@@ -1,0 +1,157 @@
+#!/bin/bash
+
+if [ -z "${1}" ];then
+  echo -e "Skriv inn pakke ID\n exiting...\n"
+  exit 
+fi
+
+
+#### CONSEPT ####
+
+##Json info jeg vil ha og hvor:
+
+###.consignmentSet[0].packageSet[0].:
+
+#PackageNumber
+#brand
+
+##size
+#lengthInCm
+#widthInCm
+#heightInCm
+#weightInKgs
+
+#dateOfEstimatedDelivery
+
+##Senderinfo
+#senderName
+#country
+#countryCode
+#city
+
+##recipientinfo
+#postalCode
+#city
+#countryCode
+#country
+#postalCode
+
+###.consignmentSet[0].packageSet[0].eventSet[0].:
+##Events
+
+#### CODE START ####
+
+#PackageNumber er first arg
+tmplocation="/tmp/postpakke"
+
+curl -sH "api-version: 2" "https://api.bring.com/tracking/api/tracking.json?q=$1" -o $tmplocation
+
+###collect info
+#general
+packagenr=$(cat $tmplocation | jq -r ".consignmentSet[0].packageSet[0].packageNumber")
+merke=$(cat $tmplocation | jq -r ".consignmentSet[0].packageSet[0].brand")
+estimert=$(cat $tmplocation | jq -r ".consignmentSet[0].packageSet[0].dateOfEstimatedDelivery")
+returdato=$(cat $tmplocation | jq -r ".consignmentSet[0].packageSet[0].dateOfReturn")
+#size
+length=$(cat $tmplocation | jq -r ".consignmentSet[0].packageSet[0].lengthInCm")
+width=$(cat $tmplocation | jq -r ".consignmentSet[0].packageSet[0].widthInCm")
+height=$(cat $tmplocation | jq -r ".consignmentSet[0].packageSet[0].heightInCm")
+weight=$(cat $tmplocation | jq -r ".consignmentSet[0].packageSet[0].weightInKgs")
+
+##sender 
+avsender=$(cat $tmplocation | jq -r ".consignmentSet[0].packageSet[0].senderName")
+scountry=$(cat $tmplocation | jq -r ".consignmentSet[0].packageSet[0].senderAddress.country")
+scity=$(cat $tmplocation | jq -r ".consignmentSet[0].packageSet[0].senderAddress.city")
+scode=$(cat $tmplocation | jq -r ".consignmentSet[0].packageSet[0].senderAddress.countryCode")
+
+##mottaker
+#mottaker=$()
+rcountry=$(cat $tmplocation | jq -r ".consignmentSet[0].packageSet[0].recipientAddress.country")
+rcity=$(cat $tmplocation | jq -r ".consignmentSet[0].packageSet[0].recipientAddress.city")
+rcode=$(cat $tmplocation | jq -r ".consignmentSet[0].packageSet[0].recipientAddress.countryCode")
+rpostalc=$(cat $tmplocation | jq -r ".consignmentSet[0].packageSet[0].recipientAddress.postalCode")
+
+##Events
+#number of Events:
+events=$(cat /tmp/postpakke | jq -r ".consignmentSet[0].packageSet[0].eventSet[].description | length" | wc -l)
+
+##DEBUG
+#
+#echo -e "DEBUG START:\n
+#1: $1 \n
+#tmplocation: $tmplocation \n
+#packagenr: $packagenr \n
+#merke: $merke \n
+#number of events: $events \n
+#estimert: $estimert \n
+#returdato: $returdato \n
+
+#length: $length \n
+#width: $width \n
+#height: $height \n
+#weight: $weight \n
+
+#avsender: $avsender \n
+#scountry: $scountry \n
+#scity: $scity \n
+#scode: $scode \n
+
+#rcountry: $rcountry \n
+#rcity: $rcity \n
+#rcode: $rcode \n
+#rpostalc: $rpostalc \n
+
+#\nDEBUG END"
+
+echo -e "
+\t\U1F4E6 Pakke info:
+\t\U1F4E4 From: $avsender
+\t| $scode $scountry > $scity |
+
+\t\U1F4E5 To:
+\t| $rcode $rcountry > $rcity > $rpostalc |
+
+\t\U1F4CF Mål: $length x $width x $height cm
+\t\U2696 Vekt:  $weight Kg
+
+\t\U1F69A Levert av: $merke
+"
+
+## Er pakke klar til henting?
+ if [ "$estimert" == "null" ]; then
+   echo -e "\t\U2705Pakke kan hentes \n\t\U2757Returdato:$returdato \n"
+   else
+  echo -e "\tEstimert levert:\U1F4C6 $estimert \n"
+ fi
+#
+#
+### Event handling
+echo -e "\n\U1F9FE Pakkehistorikk:"
+for (( eventid=0; eventid <= $((events - 1)); eventid++ )) do 
+  eventdate=$(cat /tmp/postpakke | jq -r ".consignmentSet[0].packageSet[0].eventSet[$eventid].displayDate")
+  eventtime=$(cat /tmp/postpakke | jq -r ".consignmentSet[0].packageSet[0].eventSet[$eventid].displayTime")
+  eventcountry=$(cat /tmp/postpakke | jq -r ".consignmentSet[0].packageSet[0].eventSet[$eventid].country")
+  eventcity=$(cat /tmp/postpakke | jq -r ".consignmentSet[0].packageSet[0].eventSet[$eventid].city")
+  eventcountryc=$(cat /tmp/postpakke | jq -r ".consignmentSet[0].packageSet[0].eventSet[$eventid].countryCode")
+  eventpostalc=$(cat /tmp/postpakke | jq -r ".consignmentSet[0].packageSet[0].eventSet[$eventid].postalCode")
+
+  eventstatus=$(cat /tmp/postpakke | jq -r ".consignmentSet[0].packageSet[0].eventSet[$eventid].status")
+  eventdesc=$(cat /tmp/postpakke | jq -r ".consignmentSet[0].packageSet[0].eventSet[$eventid].description")
+
+#echo -e "
+#DEBUG
+#
+#events: $events
+#eventid: $eventid
+#
+#
+#GUBED
+echo -e "
+\U1F553 $eventtime \U1F4C6 $eventdate
+$eventcountryc $eventcountry > $eventcity > $eventpostalc
+\U1F534 Status: $eventstatus
+Melding: $eventdesc
+"
+
+done
+#
