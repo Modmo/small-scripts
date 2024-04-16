@@ -30,5 +30,5 @@ convert -background white -fill black -size 600x300 -gravity South label:"'$skol
 sleep 1
 
 #### Sender png til utskrift
-cd /home/hhauk/ql570 
+cd $HOME/ql570 
 ./ql570 /dev/usb/lp0 62x29 /tmp/postlapp.png
