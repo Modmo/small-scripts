@@ -1,0 +1,42 @@
+#!/bin/bash
+#
+help () {
+echo -e "How to:\n -e encrypts the file or folder with a password\n -u decrypts the file or folder\n -h this prompt"
+}
+
+encrypt () {
+    if [ -z $filepath ]; then
+        echo "Specify Path!"
+	exit
+    fi
+tar -cf $filepath.tar $filepath           
+gpg -co $filepath.tar.gpg $filepath.tar
+rm $filepath.tar
+}
+
+decrypt () {
+	    if [ -z $filepath ]; then
+        echo "Specify Path!"
+	exit
+    fi
+noextension=$(echo $filepath | cut -d '.' -f 1)
+gpg --output $noextension.tar --decrypt $filepath
+tar -xf $noextension.tar
+rm $noextension.tar
+}
+
+
+#### Leser flagg input
+while getopts "h e: u:" flagg
+do
+    case "${flagg}" in
+        h) help;;
+	e) filepath="${OPTARG}" encrypt;;
+        u) filepath="${OPTARG}" decrypt;;
+	 \?) help;;
+    esac
+done
+
+if [ $OPTIND == 1 ]; then
+    echo "Specify path or file!"
+fi
