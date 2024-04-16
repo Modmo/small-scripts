@@ -5,9 +5,9 @@ cd $HOME/Documents
 
 #Sjekker om ny serial metode er detected, hvis ikke vanlig USB
 #Options: -L: enabler logging av all output, 9600: BAUD rate  (bit transfer rate, 9600 er standard for Cisco), crtscts: flow control for å hindre at data blir sendt/mottatt for fort(for å unngå manglet data)
-if [ -f /dev/ttyACM0 ]; then
+if [ -f "/dev/ttyACM0" ]; then
 	sudo screen -L /dev/ttyACM0 9600,crtscts
-elif [ -f /dev/ttyUSB0 ]; then
+elif [ -f "/dev/ttyUSB0" ]; then
 	sudo screen -L /dev/ttyUSB0 9600,crtscts
 else
 	echo -e "Ingen Serial Kabel koblet til\nExiting...."
