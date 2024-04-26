@@ -1,0 +1,6 @@
+#!/bin/bash
+window=$(xwininfo -root -children | grep -Po '\dx[0-9a-z]+ \K\".*(?=: \()' | uniq | dmenu -l 4)
+audiosource=$(wpctl status | grep -Po '\d\d\.\K.*[^\]]$' | uniq | dmenu -l 8 | tr -d ' ')
+audioapp=$(pactl list sink-inputs | tr -d '\n' | grep -Po "$audiosource.*(object\.serial = \")\K\d+")
+ffmpeg -y -loglevel error -framerate 24 -video_size $(xwininfo -root -children | grep -Po "$window.*\)  \K\d+x\d+" | head -1) -f x11grab -i $DISPLAY$(xwininfo -root -children | grep -Po "$window.*\)  \d+x\d+\K\+\d+\+\d+") -f pulse -i $audioapp -crf 26 -vf scale=1920:-1 ~/Videos/$(echo $window | grep -Po '([A-Z]|[a-z])+' | head -n 1)-$(date -Iminutes | tr ':+' '-').mp4
+echo -e "Debug start\nCapturing Window:$window\nAudio Source:$audiosource\nPipewire sink input ID:$audioapp\nDebug stop"
