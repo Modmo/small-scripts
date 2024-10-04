@@ -3,13 +3,19 @@
 #Putter logs i documents mappen
 cd $HOME/Documents
 
-#Sjekker om ny serial metode er detected, hvis ikke vanlig USB
-#Options: -L: enabler logging av all output, 9600: BAUD rate  (bit transfer rate, 9600 er standard for Cisco), crtscts: flow control for å hindre at data blir sendt/mottatt for fort(for å unngå manglet data)
-if [ -e "/dev/ttyACM0" ]; then
-	sudo screen -L /dev/ttyACM0 9600,crtscts
-elif [ -e "/dev/ttyUSB0" ]; then
-	sudo screen -L /dev/ttyUSB0 9600,crtscts
+#Sjekker om ny serial metode er detected, hvis ikke ACM0 eller vanlig USB
+#Options: -L: enabler logging av all output, 
+#9600: BAUD rate  (bit transfer rate, 9600 er standard for Cisco), 
+#crtscts: flow control for å hindre at data blir sendt/mottatt for fort(for å unngå manglet data)
+#defslowpaste passer på at cisco enheten mottar alt du kopierer inn når man kopierer store mengder data.
+#defscrollback øker linjer man kan scrolle back med ctrl+a,ESC
+if [ -e /dev/serial/by-id ]; then
+	serialport=$(ls /dev/serial/by-id)
+	sudo screen -L /dev/serial/by-id/$serialport 9600 -X bind ^] paste defslowpaste 100 defscrollback 10000
+elif [ -e /dev/ttyACM0 ]; then
+	sudo screen -L /dev/ttyACM0 9600 -X bind ^] paste defslowpaste 100 defscrollback 10000
+elif [ -e /dev/ttyUSB0 ]; then
+	sudo screen -L /dev/ttyUSB0 9600 -X bind ^] paste defslowpaste 100 defscrollback 10000
 else
 	echo -e "Ingen Serial Kabel koblet til\nExiting...."
 fi
-
