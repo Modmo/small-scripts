@@ -26,17 +26,19 @@ BWhite='\033[1;37m'       # White
 
 #### END COLORS ####
 
+rm /tmp/politilogg-1.json
+
 radio() {
         curl -sX 'GET' "https://api.politiet.no/politiloggen/v1/messages?Districts=Oslo&Municipalities=Oslo" -H 'accept: text/plain' -o /tmp/politilogg.json
 }
 
 json_file="/tmp/politilogg.json"
-previous_data="/tmp/politilogg.json" # Temporary file to store previous data
+previous_data="/tmp/politilogg-1.json" # Temporary file to store previous data
 
 check_file() {
 # Create the temporary file if it doesn't exist
 if [ ! -f "$previous_data" ]; then
-        exit
+        echo "[]." > $previous_data
 fi
 }
 
@@ -69,6 +71,7 @@ check_for_updates() {
 
     # Update the previous data with the current data
     echo "$current_data" | jq -s '.' > "$previous_data"
+    echo -e "\a"
   fi
 }
 
